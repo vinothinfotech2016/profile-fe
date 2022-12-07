@@ -17,7 +17,7 @@ export const mapPaths = {
   ROLESFORM: "roles/form",
 
   MYUSER: "myUser/list",
-  MYUSERFORM: "myUser/form",
+  MYUSERFORM: "/",
 
   PRODUCTMASTER: "productMaster/list",
   PRODUCTMASTERFORM: "productMaster/form",
