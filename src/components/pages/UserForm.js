@@ -6,6 +6,7 @@ import {
   Grid,
   responsiveFontSizes,
   Snackbar,
+  Typography,
 } from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
 import { customErrorMsg } from "../../template/customErrorMsg";
@@ -22,6 +23,7 @@ import { ADD, CANCEL, UPDATE } from "../constants/ButtonConstants";
 import { Usertable } from "./Usertable";
 import Container from "@mui/material/Container";
 import { NavBar } from "../shared/NavBar";
+import { createUser, getUsers, updateUser } from "../api/api";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -35,6 +37,7 @@ export const UserForm = (props) => {
   const [open, setOpen] = React.useState(false);
   const [role, setRole] = React.useState([]);
   const [products, setProducts] = React.useState([]);
+  const [editId, setEditId] = React.useState(null);
   const dispatch = useDispatch();
   const location = useLocation();
   const editData = location.state;
@@ -61,62 +64,34 @@ export const UserForm = (props) => {
 
   const add = (values) => {
     setUserLists([...userLists, values.formData]);
-    console.log(values, "values");
-    dispatch(
-      snackBarAction({
-        color: "success",
-        open: true,
-        message: snackBarMessages.USER_CREATION_SUCCESS,
+    values.formData.mobileNumber = values.formData.mobileNumber.toString();
+    createUser(values.formData)
+      .then(() => {
+        alert("user created");
+        setUserData({});
       })
-    );
-    dispatch(
-      snackBarAction({
-        color: "error",
-        open: true,
-        message: snackBarMessages.USER_CREATION_FAILED,
-      })
-    );
+      .catch((err) => JSON.stringify(err));
   };
 
-  const update = (values) => {
+  const update = async (values) => {
     const { name, email, mobileNumber } = values.formData;
-    // updateUser(editData?.id, {
-    //   name,
-    //   email,
-    //   mobileNumber: mobileNumber.toString(),
-    // })
-    //   .then((res) => {
-    //     console.log(res);
-    //     navigate(clickPaths.USENAVIGATEMYUSER);
-    //     dispatch(
-    //       snackBarAction({
-    //         color: "success",
-    //         open: true,
-    //         message: snackBarMessages.USER_CREATION_SUCCESS,
-    //       })
-    //     );
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //     dispatch(
-    //       snackBarAction({
-    //         color: "error",
-    //         open: true,
-    //         message:
-    //           typeof error?.response?.data?.error === "string"
-    //             ? error?.response?.data?.error
-    //             : snackBarMessages.USER_CREATION_FAILED,
-    //       })
-    //     );
-    //   });
+    await updateUser(values.formData, userData.id);
+    setEditId(null);
+    await fetchAllUsers();
   };
-
+  const fetchAllUsers = async () => {
+    const { data } = await getUsers();
+    setUserLists(data);
+  };
+  useEffect(() => {
+    fetchAllUsers();
+  }, []);
   return (
     <>
       <NavBar />
       <Container maxWidth="lg" style={{ paddingTop: 100 }}>
         <Grid container spacing={2}>
-          <Grid item xs={6}>
+          <Grid item xs={4}>
             <Form
               schema={formNewUserSchema(role, products, editData)}
               uiSchema={formNewUserUiSchema()}
@@ -137,35 +112,23 @@ export const UserForm = (props) => {
               }}
               onSubmit={(values) => {
                 if (!values?.formData?.email.match(emailRegex)) {
-                  dispatch(
-                    snackBarAction({
-                      open: true,
-                      color: "error",
-                      message: snackBarMessages.INVALID_EMAIL,
-                    })
-                  );
+                  alert("Please Enter Valid Email");
                   return;
                 }
                 if (
                   !values?.formData?.mobileNumber.toString().match(mobileRegex)
                 ) {
-                  dispatch(
-                    snackBarAction({
-                      open: true,
-                      color: "error",
-                      message: snackBarMessages.INVALID_MOBILE_NUMBER,
-                    })
-                  );
+                  alert("Please Enter Valid Mobile Number");
                   return;
                 }
-                editData ? update(values) : add(values);
+                editId ? update(values) : add(values);
               }}
             >
               <div className="btnContainer">
                 <Button
                   variant="outlined"
                   className="btn"
-                  onClick={() => navigate(clickPaths.USENAVIGATEMYUSER)}
+                  onClick={() => setUserData({})}
                 >
                   {CANCEL}
                 </Button>
@@ -175,7 +138,7 @@ export const UserForm = (props) => {
                   className="btn"
                   onClick={() => setLiveValidator(true)}
                 >
-                  {editData ? UPDATE : ADD}
+                  {editId ? UPDATE : ADD}
                 </Button>
                 <Snackbar
                   open={open}
@@ -189,8 +152,27 @@ export const UserForm = (props) => {
               </div>
             </Form>
           </Grid>
-          <Grid item xs={6}>
-            <Usertable tableData={userLists} />
+          <Grid item xs={8}>
+            <Typography
+              variant="h6"
+              color="inherit"
+              component="div"
+              sx={{
+                width: "100%",
+                backgroundColor: "#fff",
+                color: "black",
+                textAlign: "center",
+              }}
+            >
+              User Lists
+            </Typography>
+            <Usertable
+              onEdit={(index) => {
+                setEditId(userLists[index].id);
+                setUserData(userLists[index]);
+              }}
+              tableData={userLists}
+            />
           </Grid>
         </Grid>
       </Container>

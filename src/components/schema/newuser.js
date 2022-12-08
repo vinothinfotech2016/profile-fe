@@ -12,7 +12,7 @@ export const formNewUserSchema = (role, products, editData) => ({
       label: "Email",
     },
     mobileNumber: {
-      type: "number",
+      type: "string",
       label: "Mobile Number",
     },
     profileUrl: {
@@ -26,13 +26,12 @@ export const formNewUserSchema = (role, products, editData) => ({
 });
 
 export const formNewUserUiSchema = (editId) => ({
-  name: {},
-  email: { xs: 6 },
-  mobileNumber: { xs: 6 },
   profileUrl: {
-    xs: 6,
+    xs: 12,
     "ui:widget": "FileWidget",
     uploadFile: true,
-    // editId: editId,
   },
+  name: { xs: 12 },
+  email: { xs: 12 },
+  mobileNumber: { xs: 12 },
 });

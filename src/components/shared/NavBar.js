@@ -9,7 +9,6 @@ import Avatar from "@mui/material/Avatar";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import { styled } from "@mui/material/styles";
-import { initValues } from "../constants/constant";
 import { useNavigate } from "react-router-dom";
 import { getRole } from "../api/api";
 
@@ -29,24 +28,6 @@ const UserTextCont = styled(Box)`
 
 export const NavBar = (props) => {
   const [anchorElUser, setAnchorElUser] = React.useState(null);
-  const navigate = useNavigate();
-  const [roles, setRoles] = React.useState([]);
-
-  const handleOpenUserMenu = (event) => {
-    setAnchorElUser(event.currentTarget);
-  };
-  let userInfo = JSON.parse(localStorage.getItem("user"));
-  const userRole = userInfo?.data?.role
-
-  useEffect(() => {
-    getRole()
-      .then((res) => {
-        setRoles(res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
 
   return (
     <Box>
@@ -67,72 +48,14 @@ export const NavBar = (props) => {
           sx={{
             border: "1px solid #9e9e9e",
             maxHeight: "56px",
-            width: "15.5%",
+            width: "100%",
             backgroundColor: "#fff",
-          }}
-        ></Typography>
-        <Toolbar
-          variant="dense"
-          sx={{
-            display: "flex",
-            justifyContent: "flex-end",
-            backgroundColor: "#fff",
-            border: "1px solid #9e9e9e",
-            width: "85%",
+            color: "black",
+            textAlign: "center",
           }}
         >
-          <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <UserCont onClick={handleOpenUserMenu} sx={{
-                borderLeft:"1px solid #707070"
-              }} >
-                <UserTextCont>
-                  <Typography sx={{ color: "#000", fontSize: "bold" }}>
-                    {userInfo.data.name}
-                  </Typography>
-                  <Typography sx={{ color: "#9e9e9e", fontSize: "12px" }}>
-                    {roles.map((role) => {
-                      return role.id === userInfo?.data?.roleId && role.role;
-                    })}
-                  </Typography>
-                </UserTextCont>
-                <Avatar src="" sx={{ marginLeft: "10px" }} />
-              </UserCont>
-            </Tooltip>
-            <Menu
-              sx={{ mt: "45px" }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={() => {
-                setAnchorElUser(null);
-              }}
-            >
-              {initValues(userRole).map((item, index) => {
-                return (
-                  <MenuItem
-                    key={index}
-                    onClick={() => {
-                      setAnchorElUser(null);
-                      navigate(`${item.route}`);
-                    }}
-                  >
-                    <Typography textAlign="center">{item.name}</Typography>
-                  </MenuItem>
-                );
-              })}
-            </Menu>
-          </Box>
-        </Toolbar>
+          User Profile
+        </Typography>
       </AppBar>
     </Box>
   );

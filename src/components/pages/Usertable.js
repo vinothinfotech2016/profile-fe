@@ -5,23 +5,13 @@ import { userList } from "../constants/User";
 import { getRole, getUsers } from "../api/api";
 
 export const Usertable = (props) => {
-  const [roles, setRoles] = React.useState([]);
   const { tableData } = props;
-  useEffect(() => {
-    getRole()
-      .then((res) => {
-        setRoles(res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
 
   return (
     <>
       <ListContainer>
         <CustomReactTable
-          columnData={userList(roles, tableData)}
+          columnData={userList(props.onEdit, tableData)}
           rawData={tableData}
           disableRowSelection={true}
           disablePagination={true}

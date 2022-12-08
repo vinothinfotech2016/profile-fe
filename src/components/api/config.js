@@ -3,7 +3,7 @@ import { store } from "../../redux";
 import { closeLoaderAction, openLoaderAction } from "../../redux/actions";
 
 const appApi = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: "http://design-tool-804828304.ap-south-1.elb.amazonaws.com",
 });
 
 appApi.interceptors.request.use((request) => {
